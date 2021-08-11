@@ -48,14 +48,31 @@ try{
   .insertOne({ name: name, password: password });
   res.send({success:true})
 }
-
 catch(err){
   console.log("error:",err)
   res.send({success:false})
 }
+  });
 
-
-    res.send(req.body.name);
+  app.post('/logIn', async(req, res) => {  
+    // async avant parametres               
+    let name = req.body.name;
+    let password = req.body.password;
+try{
+  user = await dbo
+  .collection("users")
+  .findOne({ name: name, password: password });
+  // res.send({success:true})
+  if (!user) {
+    res.send({success:false})
+  }else {
+    res.send({success:true}) 
+  }
+}
+catch(err){
+  console.log("error:",err)
+  res.send({success:false})
+}
   });
 
 
