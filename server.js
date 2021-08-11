@@ -7,6 +7,30 @@ const bodyParser = require('body-parser')
 const app = express()
 app.use(express.json());
 
+// let mongodb = require("mongodb");
+// let MongoClient = mongodb.MongoClient;
+// // let ObjectId = mongodb.ObjectID;
+// let dbo = undefined;
+// let url = process.env.MONGO_URI;
+// MongoClient.connect(url, { useUnifiedTopology: true })
+// .then((client) => {
+// dbo = client.db("DriveThruCloset");
+// console.log("dbo",dbo)
+// })
+// .catch((err) => console.log(err));
+
+let mongodb = require("mongodb");
+let MongoClient = mongodb.MongoClient;
+let ObjectId = mongodb.ObjectID;
+let dbo = undefined;
+// let url = process.env.MONGO_ACCESS;
+let url =
+"mongodb+srv://Nathalie:jp2elXmPqjbmWyt8@cluster1.ohk4p.mongodb.net/DriveThruCloset?retryWrites=true&w=majority";
+MongoClient.connect(url, { useUnifiedTopology: true })
+.then((client) => {
+dbo = client.db("DriveThruCloset");
+})
+.catch((err) => console.log(err));
 
 
 app.get('/', (req, res) => { 
@@ -14,11 +38,24 @@ app.get('/', (req, res) => {
     res.send({hello:"hello"});
   });
 
-  app.post('/post', (req, res) => { 
-    console.log("req",req)  
-    console.log("req.body",req.body)  
-    console.log("req.body.test",req.body.test)                  
-    res.send({hello:"hello"});
+  app.post('/signUp', async(req, res) => {  
+    // async avant parametres               
+    let name = req.body.name;
+    let password = req.body.password;
+try{
+  await dbo
+  .collection("users")
+  .insertOne({ name: name, password: password });
+  res.send({success:true})
+}
+
+catch(err){
+  console.log("error:",err)
+  res.send({success:false})
+}
+
+
+    res.send(req.body.name);
   });
 
 
