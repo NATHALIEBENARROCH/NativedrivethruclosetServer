@@ -1,10 +1,9 @@
 // server drive thru closet
 
+const express = require("express");
+const bodyParser = require("body-parser");
 
-const express = require('express')
-const bodyParser = require('body-parser')
-
-const app = express()
+const app = express();
 app.use(express.json());
 
 // let mongodb = require("mongodb");
@@ -20,66 +19,73 @@ app.use(express.json());
 // .catch((err) => console.log(err));
 
 let mongodb = require("mongodb");
+let multer = require("multer");
 let MongoClient = mongodb.MongoClient;
 let ObjectId = mongodb.ObjectID;
 let dbo = undefined;
 // let url = process.env.MONGO_ACCESS;
 let url =
-"mongodb+srv://Nathalie:jp2elXmPqjbmWyt8@cluster1.ohk4p.mongodb.net/DriveThruCloset?retryWrites=true&w=majority";
+  "mongodb+srv://Nathalie:jp2elXmPqjbmWyt8@cluster1.ohk4p.mongodb.net/DriveThruCloset?retryWrites=true&w=majority";
 MongoClient.connect(url, { useUnifiedTopology: true })
-.then((client) => {
-dbo = client.db("DriveThruCloset");
-})
-.catch((err) => console.log(err));
+  .then((client) => {
+    dbo = client.db("DriveThruCloset");
+  })
+  .catch((err) => console.log(err));
 
+app.use(express.static("./public"));
 
-app.get('/', (req, res) => { 
-    console.log("tentative")               
-    res.send({hello:"hello"});
-  });
+app.get("/", (req, res) => {
+  console.log("tentative");
+  res.send({ hello: "hello" });
+});
 
-  app.post('/signUp', async(req, res) => {  
-    // async avant parametres               
-    let name = req.body.name;
-    let password = req.body.password;
-try{
-  await dbo
-  .collection("users")
-  .insertOne({ name: name, password: password });
-  res.send({success:true})
-}
-catch(err){
-  console.log("error:",err)
-  res.send({success:false})
-}
-  });
-
-  app.post('/logIn', async(req, res) => {  
-    // async avant parametres               
-    let name = req.body.name;
-    let password = req.body.password;
-try{
-  user = await dbo
-  .collection("users")
-  .findOne({ name: name, password: password });
-  // res.send({success:true})
-  if (!user) {
-    res.send({success:false})
-  }else {
-    res.send({success:true}) 
+app.post("/signUp", async (req, res) => {
+  // async avant parametres
+  let name = req.body.name;
+  let password = req.body.password;
+  try {
+    await dbo.collection("users").insertOne({ name: name, password: password });
+    res.send({ success: true });
+  } catch (err) {
+    console.log("error:", err);
+    res.send({ success: false });
   }
-}
-catch(err){
-  console.log("error:",err)
-  res.send({success:false})
-}
-  });
+});
 
+app.post("/logIn", async (req, res) => {
+  // async avant parametres
+  let name = req.body.name;
+  let password = req.body.password;
+  try {
+    user = await dbo
+      .collection("users")
+      .findOne({ name: name, password: password });
+    // res.send({success:true})
+    if (!user) {
+      res.send({ success: false });
+    } else {
+      res.send({ success: true });
+    }
+  } catch (err) {
+    console.log("error:", err);
+    res.send({ success: false });
+  }
+});
 
+app.get("/fetchClothes/:user", async (req, res) => {
+  let user = req.params.user;
+  try {
+    let clothes = await dbo
+      .collection("clothing")
+      .find({ userId: user })
+      .toArray();
+    res.render({ success: true, file: `uploads/1.JPG` });
+  } catch (err) {
+    console.log("error:", err);
+    res.send({ success: false });
+  }
+});
 
-
-
-app.listen(4000, '0.0.0.0', () => { console.log("Server running on port 4000") })
-
-
-
+app.listen(4000, "0.0.0.0", () => {
+  console.log("Server running on port 4000");
+});
