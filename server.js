@@ -60,11 +60,20 @@ app.post("/logIn", async (req, res) => {
     user = await dbo
       .collection("users")
       .findOne({ name: name, password: password });
-    // res.send({success:true})
+
     if (!user) {
       res.send({ success: false });
     } else {
-      res.send({ success: true });
+      let clothes = await dbo
+        .collection("clothing")
+        .find({ userId: user._id.toString() })
+        .toArray();
+
+      res.send({
+        success: true,
+        clothes: clothes,
+        user: { id: user._id.toString(), name: name },
+      });
     }
   } catch (err) {
     console.log("error:", err);
