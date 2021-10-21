@@ -33,11 +33,12 @@ MongoClient.connect(url, { useUnifiedTopology: true })
   .catch((err) => console.log(err));
 
 app.use(express.static("./public"));
+// gives access to files in public folder
 
-app.get("/", (req, res) => {
-  console.log("tentative");
-  res.send({ hello: "hello" });
-});
+// app.get("/", (req, res) => {
+//   console.log("tentative");
+//   res.send({ hello: "hello" });
+// });
 
 app.post("/signUp", async (req, res) => {
   // async avant parametres
@@ -89,6 +90,23 @@ app.get("/fetchClothes/:user", async (req, res) => {
       .find({ userId: user })
       .toArray();
     res.render({ success: true, file: `uploads/1.JPG` });
+  } catch (err) {
+    console.log("error:", err);
+    res.send({ success: false });
+  }
+});
+
+// THIS BACKEND WILL SEND INFO TO DB TO KEEP THE OUTFITS
+app.post("/saveOutfit", async (req, res) => {
+  console.log("req.body:", req.body);
+  // async avant parametres
+  let outfit = req.body.outfit;
+  try {
+    await dbo.collection("outfits").insertOne(outfit);
+    res.send({
+      success: true,
+      message: `You just saved ${outfit.title}`,
+    });
   } catch (err) {
     console.log("error:", err);
     res.send({ success: false });
