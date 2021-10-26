@@ -70,9 +70,15 @@ app.post("/logIn", async (req, res) => {
         .find({ userId: user._id.toString() })
         .toArray();
 
+      let outfits = await dbo
+        .collection("outfits")
+        .find({ userId: user._id.toString() })
+        .toArray();
+      console.log("outfits1:", outfits);
       res.send({
         success: true,
         clothes: clothes,
+        outfits: outfits,
         user: { id: user._id.toString(), name: name },
       });
     }
@@ -101,11 +107,18 @@ app.post("/saveOutfit", async (req, res) => {
   console.log("req.body:", req.body);
   // async avant parametres
   let outfit = req.body.outfit;
+  let userId = req.body.userId;
   try {
     await dbo.collection("outfits").insertOne(outfit);
+    let outfits = await dbo
+      .collection("outfits")
+      .find({ userId: userId })
+      .toArray();
+    console.log("outfits:", outfits);
     res.send({
       success: true,
       message: `You just saved ${outfit.title}`,
+      outfits: outfits,
     });
   } catch (err) {
     console.log("error:", err);
