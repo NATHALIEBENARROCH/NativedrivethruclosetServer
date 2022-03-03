@@ -2,9 +2,11 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // let mongodb = require("mongodb");
 // let MongoClient = mongodb.MongoClient;
@@ -41,6 +43,7 @@ app.use(express.static("./public"));
 // });
 
 app.post("/signUp", async (req, res) => {
+  console.log("hello world");
   // async avant parametres
   let name = req.body.name;
   let password = req.body.password;
