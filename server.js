@@ -3,8 +3,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+require("dotenv").config();
 const app = express();
+
 app.use(express.json());
 app.use(cors());
 
@@ -26,8 +27,7 @@ let MongoClient = mongodb.MongoClient;
 let ObjectId = mongodb.ObjectID;
 let dbo = undefined;
 // let url = process.env.MONGO_ACCESS;
-let url =
-  "mongodb+srv://Nathalie:jp2elXmPqjbmWyt8@cluster1.ohk4p.mongodb.net/DriveThruCloset?retryWrites=true&w=majority";
+let url = process.env.MONGO_URI;
 MongoClient.connect(url, { useUnifiedTopology: true })
   .then((client) => {
     dbo = client.db("DriveThruCloset");
@@ -58,6 +58,7 @@ app.post("/signUp", async (req, res) => {
 
 app.post("/logIn", async (req, res) => {
   // async avant parametres
+  console.log("ready");
   let name = req.body.name;
   let password = req.body.password;
   try {
