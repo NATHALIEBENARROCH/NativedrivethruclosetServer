@@ -5,7 +5,10 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-
+const multer = require("multer");
+const uploads = multer({
+  dest: __dirname + "/uploads",
+});
 app.use(express.json());
 app.use(cors());
 
@@ -22,12 +25,37 @@ app.use(cors());
 // .catch((err) => console.log(err));
 
 let mongodb = require("mongodb");
-let multer = require("multer");
+let multerS3 = require("multer-s3");
+let aws = require("aws-sdk");
 let MongoClient = mongodb.MongoClient;
 let ObjectId = mongodb.ObjectID;
 let dbo = undefined;
 // let url = process.env.MONGO_ACCESS;
 let url = process.env.MONGO_URI;
+
+const { AWS_SECRET, AWS_ACCESS } = process.env;
+aws.config.update({
+  secretAccessKey: AWS_SECRET,
+  accessKeyId: AWS_ACCESS,
+  region: "us-east-1",
+});
+
+let s3 = new aws.S3({ apiVersion: "2006-03-01" });
+
+let upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: "glorious-roll",
+    acl: "public-read",
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString());
+    },
+  }),
+});
+
 MongoClient.connect(url, { useUnifiedTopology: true })
   .then((client) => {
     dbo = client.db("DriveThruCloset");
@@ -79,6 +107,7 @@ app.post("/logIn", async (req, res) => {
         .find({ userId: user._id.toString() })
         .toArray();
       console.log("outfits1:", outfits);
+      console.log("clothesupdate", clothes);
       res.send({
         success: true,
         clothes: clothes,
@@ -92,7 +121,7 @@ app.post("/logIn", async (req, res) => {
   }
 });
 
-app.get("/fetchClothes/:user", async (req, res) => {
+app.get("/user", async (req, res) => {
   let user = req.params.user;
   try {
     let clothes = await dbo

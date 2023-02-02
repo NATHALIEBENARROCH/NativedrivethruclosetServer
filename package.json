@@ -19,12 +19,14 @@
   },
   "homepage": "https://github.com/NATHALIEBENARROCH/NativedrivethruclosetServer#readme",
   "dependencies": {
+    "aws-sdk": "^2.1243.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
     "mongodb": "^4.1.0",
-    "multer": "^1.4.3",
+    "multer": "^1.4.4",
+    "multer-s3": "^3.0.1",
     "react-native-dotenv": "^3.3.1"
   }
 }
